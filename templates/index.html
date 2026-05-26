@@ -637,6 +637,55 @@
                     <p style="max-width: 800px; margin: 10px auto 0; font-size: 14.5px; color: var(--text-secondary);">The Cleveland database is a gold standard cardiac repository comprising 303 cases. In our pre-processing, patients indicating categorical integers 1, 2, 3, or 4 for disease narrowing are classified under diagnostic Heart Disease (1), while level 0 implies Normal (0).</p>
                 </div>
 
+                <!-- Comparative Analysis of Datasets -->
+                <div class="glass-card">
+                    <h3 style="margin-bottom: 15px; font-size: 18px; color: var(--primary);">Cardiovascular Dataset Benchmark Analysis</h3>
+                    <p style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 15px;">A comparative review of the gold-standard cardiac datasets in medical machine learning research, highlighting structural parameters and justifying our selection of the UCI Cleveland repository.</p>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Dataset Name</th>
+                                    <th>Instances (Sample Size)</th>
+                                    <th>Features Count</th>
+                                    <th>Target Output</th>
+                                    <th>Key Research Focus</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>UCI Cleveland</strong></td>
+                                    <td>303</td>
+                                    <td>14 (used) / 76 (raw)</td>
+                                    <td>Binary / Multi-class (0-4)</td>
+                                    <td>Coronary artery disease presence and severity narrowing.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Framingham</strong></td>
+                                    <td>4,240</td>
+                                    <td>16</td>
+                                    <td>Binary (10-year CHD risk)</td>
+                                    <td>Long-term longitudinal cardiovascular risk forecasting.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Statlog (Heart)</strong></td>
+                                    <td>270</td>
+                                    <td>13</td>
+                                    <td>Binary (Presence/Absence)</td>
+                                    <td>Structured categorical benchmarking for classifiers.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Kaggle Cardiovascular</strong></td>
+                                    <td>70,000</td>
+                                    <td>12</td>
+                                    <td>Binary (Cardio disease)</td>
+                                    <td>Large-scale clinical examination vitals classification.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- Subplots Visualizations -->
                 <div class="visualizations-row">
                     <div class="glass-card vis-card">
