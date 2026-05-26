@@ -21,6 +21,10 @@ app.config['SECRET_KEY'] = 'heart_ai_clinical_token_secret_key_2026_spec'
 os.makedirs(os.path.join(app.root_path, 'reports'), exist_ok=True)
 os.makedirs(os.path.join(app.root_path, 'ml', 'models'), exist_ok=True)
 
+# Initialize database schema at startup
+print("Initializing database tables...")
+init_db()
+
 # --------------------------------------------------------------------------
 # Route Guard Decorators
 # --------------------------------------------------------------------------
