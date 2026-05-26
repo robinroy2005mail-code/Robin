@@ -954,14 +954,6 @@
                 lucide.createIcons();
             }
         });
-        
-        // Setup MutationObserver to watch DOM modifications and replace new lucide icons
-        const observer = new MutationObserver(() => {
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
     </script>
 </body>
 </html>
