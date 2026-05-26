@@ -2,10 +2,6 @@
  * HEARTAI SYSTEM - MAIN APPLICATION ROUTER & ENVIRONMENT
  */
 
-import Auth from './auth.js';
-import Dashboard from './dashboard.js';
-import Prediction from './prediction.js';
-import Admin from './admin.js';
 
 const App = {
     protectedRoutes: ['/dashboard', '/predict', '/results', '/admin', '/profile', '/settings'],
