@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Disease Prediction System - AI Clinical Decision Support</title>
+    
+    <!-- Meta SEO Details -->
+    <meta name="description" content="AI Powered Heart Disease Prediction System using the UCI Cleveland Dataset. Predict cardiac risks with Stacking, Random Forest, and XGBoost classifiers.">
+    <meta name="keywords" content="Heart Disease Prediction, UCI Cleveland Dataset, AI Healthcare, Machine Learning Cardiac Analysis, Clinical Decision Support">
+    <meta name="author" content="Cardiology AI Research Team">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Lucide Icons via CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Core Stylesheets -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+
+    <!-- 1. Header Navigation Bar -->
+    <header>
+        <div class="logo-container">
+            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart-pulse"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l1.5-3 2 6 1.5-3h3.8"/></svg>
+            <span>Heart<span>AI</span></span>
+        </div>
+        
+        <nav>
+            <a href="#/" class="active">Home</a>
+            <a href="#/dataset-info">Dataset Information</a>
+            <a href="#/docs">Documentation</a>
+            <!-- Protected Nav items -->
+            <a href="#/dashboard" class="nav-auth-state" data-show="logged-in" style="display: none;">Dashboard</a>
+            <a href="#/predict" class="nav-auth-state" data-show="logged-in" style="display: none;">Diagnosis Wizard</a>
+            <a href="#/admin" class="nav-auth-state" data-show="admin-only" style="display: none;">Admin Panel</a>
+        </nav>
+        
+        <div class="right-controls">
+            <!-- Theme Toggle Switch -->
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="theme-toggle-checkbox">
+                    <input type="checkbox" id="theme-toggle-checkbox" />
+                    <div class="slider">
+                        <!-- Sun Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                        <!-- Moon Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                    </div>
+                </label>
+            </div>
+            
+            <!-- Guest Links -->
+            <div class="nav-auth-state" data-show="logged-out" style="display: flex; gap: 10px;">
+                <a href="#/login" class="btn btn-outline" style="padding: 6px 14px; font-size: 13px;">Login</a>
+                <a href="#/register" class="btn btn-primary" style="padding: 6px 14px; font-size: 13px;">Register</a>
+            </div>
+            
+            <!-- User Session Dropdown -->
+            <div class="nav-auth-state profile-dropdown-container" data-show="logged-in" style="display: none;">
+                <div class="profile-trigger" id="nav-profile-trigger">
+                    <div class="avatar-sm" id="nav-avatar-char">U</div>
+                    <span class="nav-user-display" style="font-size: 14px; font-weight: 600; color: var(--text-primary);">User</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                </div>
+                <div class="profile-dropdown" id="nav-profile-dropdown">
+                    <div style="padding: 10px 16px; border-bottom: 1px solid var(--border);">
+                        <div class="nav-user-display" style="font-weight: 700; color: var(--text-primary); font-size: 14px;">User</div>
+                        <div class="nav-role-display" style="font-size: 11px; color: var(--text-secondary);">Patient</div>
+                    </div>
+                    <a href="#/profile" class="dropdown-item">
+                        <i data-lucide="user" style="width: 14px; height: 14px;"></i> Profile Account
+                    </a>
+                    <a href="#/settings" class="dropdown-item">
+                        <i data-lucide="settings" style="width: 14px; height: 14px;"></i> Settings
+                    </a>
+                    <a href="#" class="dropdown-item logout-trigger" style="border-top: 1px solid var(--border); color: var(--error);">
+                        <i data-lucide="log-out" style="width: 14px; height: 14px;"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. Main Content Views Section -->
+    <main>
+        
+        <!-- View A: Landing Page -->
+        <div id="landing-view" class="view-section active">
+            <div class="hero-section">
+                <div class="hero-text">
+                    <h1 class="hero-title">AI-Powered<br><span>Heart Disease</span><br>Prediction System</h1>
+                    <p class="hero-sub">Utilize state-of-the-art machine learning ensemble models trained on the UCI Cleveland dataset to analyze cardiac vitals and predict heart disease risks with clinical-grade accuracy.</p>
+                    <div class="hero-buttons">
+                        <a href="#/predict" class="btn btn-primary" style="padding: 12px 28px; font-size: 15px;">Get Started</a>
+                        <a href="#/dataset-info" class="btn btn-outline" style="padding: 12px 28px; font-size: 15px;">Explore Dataset</a>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="pulse-circle"></div>
+                    <!-- Heart Anatomy Illustration -->
+                    <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M100 160c-25-25-60-45-60-80s30-50 60-15c30-35 60-20 60 15s-35 55-60 80Z" fill="var(--accent)" fill-opacity="0.1" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round"/>
+                        <path d="M60 90h25l5-15 8 30 7-20 5 5h30" stroke="var(--primary)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="100" cy="95" r="70" stroke="var(--primary)" stroke-width="1.5" stroke-dasharray="5 5"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <h2 class="section-divider-title">Core System Features</h2>
+            <div class="features-grid">
+                <div class="glass-card feature-card">
+                    <div class="feature-icon-wrapper">
+                        <i data-lucide="brain-circuit" style="width: 28px; height: 28px;"></i>
+                    </div>
+                    <h3 class="feature-title">Ensemble Stacking ML</h3>
+                    <p style="font-size: 13.5px; color: var(--text-secondary);">Combines Random Forest and XGBoost predictions through a Logistic Regression stacking meta-classifier to output optimized, robust probabilities.</p>
+                </div>
+                <div class="glass-card feature-card">
+                    <div class="feature-icon-wrapper">
+                        <i data-lucide="file-text" style="width: 28px; height: 28px;"></i>
+                    </div>
+                    <h3 class="feature-title">PDF Clinical Reports</h3>
+                    <p style="font-size: 13.5px; color: var(--text-secondary);">Generate comprehensive cardiological PDF reports complete with clinical metrics ranges, probability score cards, and lifestyle intervention protocols.</p>
+                </div>
+                <div class="glass-card feature-card">
+                    <div class="feature-icon-wrapper">
+                        <i data-lucide="shield-check" style="width: 28px; height: 28px;"></i>
+                    </div>
+                    <h3 class="feature-title">Secure & Compliant</h3>
+                    <p style="font-size: 13.5px; color: var(--text-secondary);">Engineered with cryptographic password hashing (PBKDF2), JSON Web Token (JWT) session controls, and role-based permissions.</p>
+                </div>
+            </div>
+            
+            <h2 class="section-divider-title">How It Works</h2>
+            <div class="workflow-container">
+                <div class="workflow-step">
+                    <div class="step-num">1</div>
+                    <h4 style="margin-bottom: 8px;">Registration</h4>
+                    <p style="font-size: 13px; color: var(--text-secondary);">Create a secure user profile credentials to access predictions logs dashboard.</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-num">2</div>
+                    <h4 style="margin-bottom: 8px;">Vitals Diagnostic</h4>
+                    <p style="font-size: 13px; color: var(--text-secondary);">Input 13 cardiological factors through our progressive wizard.</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-num">3</div>
+                    <h4 style="margin-bottom: 8px;">Ensemble Analysis</h4>
+                    <p style="font-size: 13px; color: var(--text-secondary);">Our models evaluate inputs, scale parameters, and compute risk levels.</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-num">4</div>
+                    <h4 style="margin-bottom: 8px;">Clinical Output</h4>
+                    <p style="font-size: 13px; color: var(--text-secondary);">Obtain diagnostic risk categories and download a printable report.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- View B: Login Page -->
+        <div id="login-view" class="view-section">
+            <div class="auth-container glass-card">
+                <div class="auth-header">
+                    <i data-lucide="lock" style="width: 32px; height: 32px; color: var(--primary); margin-bottom: 10px;"></i>
+                    <h2>Patient Portal Login</h2>
+                    <p style="font-size: 13px; color: var(--text-secondary);">Secure authentication for cardiac risk predictions</p>
+                </div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label class="form-label" for="login-email">Email Address</label>
+                        <input type="email" id="login-email" class="form-control" required placeholder="name@hospital.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="login-password">Password</label>
+                        <input type="password" id="login-password" class="form-control" required placeholder="••••••••">
+                    </div>
+                    <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="login-remember"> Remember me
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 10px;">Log In</button>
+                </form>
+                <div class="auth-footer-links">
+                    <a href="#/register">Create Account</a>
+                    <a href="#/forgot-password">Forgot Password?</a>
+                </div>
+                <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;">
+                    <a href="#/admin-login" style="font-size: 12.5px; font-weight: 600; color: var(--secondary);">Administrator Access Panel &rarr;</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- View C: Register Page -->
+        <div id="register-view" class="view-section">
+            <div class="auth-container glass-card">
+                <div class="auth-header">
+                    <i data-lucide="user-plus" style="width: 32px; height: 32px; color: var(--primary); margin-bottom: 10px;"></i>
+                    <h2>Register Account</h2>
+                    <p style="font-size: 13px; color: var(--text-secondary);">Create a secure record profile for analysis logs</p>
+                </div>
+                <form id="register-form">
+                    <div class="form-group">
+                        <label class="form-label" for="register-username">Full Name</label>
+                        <input type="text" id="register-username" class="form-control" required placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="register-email">Email Address</label>
+                        <input type="email" id="register-email" class="form-control" required placeholder="john@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="register-password">Password</label>
+                        <input type="password" id="register-password" class="form-control" required placeholder="Minimum 8 characters">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="register-confirm-password">Confirm Password</label>
+                        <input type="password" id="register-confirm-password" class="form-control" required placeholder="Confirm your password">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 10px;">Sign Up</button>
+                </form>
+                <div class="auth-footer-links" style="justify-content: center; gap: 5px;">
+                    <span>Already registered?</span> <a href="#/login">Log In here</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- View D: Admin Login Page -->
+        <div id="admin-login-view" class="view-section">
+            <div class="auth-container glass-card" style="border: 1.5px solid var(--accent);">
+                <div class="auth-header">
+                    <i data-lucide="shield-alert" style="width: 32px; height: 32px; color: var(--accent); margin-bottom: 10px;"></i>
+                    <h2 style="color: var(--accent);">Admin Authorization</h2>
+                    <p style="font-size: 13px; color: var(--text-secondary);">Authorized personnel credentials required</p>
+                </div>
+                <form id="admin-login-form">
+                    <div class="form-group">
+                        <label class="form-label" for="admin-email">Admin Email</label>
+                        <input type="email" id="admin-email" class="form-control" required placeholder="admin@heartai.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="admin-password">Admin Password</label>
+                        <input type="password" id="admin-password" class="form-control" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-danger" style="width: 100%; padding: 12px; margin-top: 10px;">Authenticate Admin</button>
+                </form>
+                <div class="auth-footer-links" style="justify-content: center;">
+                    <a href="#/login">&larr; Return to Patient Portal</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- View E: Forgot Password Page -->
+        <div id="forgot-password-view" class="view-section">
+            <div class="auth-container glass-card">
+                <div class="auth-header">
+                    <i data-lucide="key-round" style="width: 32px; height: 32px; color: var(--primary); margin-bottom: 10px;"></i>
+                    <h2>Forgot Password</h2>
+                    <p style="font-size: 13px; color: var(--text-secondary);">Enter your account email to receive a recovery request</p>
+                </div>
+                <form id="forgot-form">
+                    <div class="form-group">
+                        <label class="form-label" for="forgot-email">Account Email</label>
+                        <input type="email" id="forgot-email" class="form-control" required placeholder="yourname@domain.com">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 10px;">Send Reset Link</button>
+                </form>
+                <div class="auth-footer-links" style="justify-content: center;">
+                    <a href="#/login">&larr; Back to Login</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- View F: User Dashboard -->
+        <div id="dashboard-view" class="view-section">
+            <div class="dashboard-layout">
+                
+                <!-- Dashboard Sidebar Navigation -->
+                <aside class="sidebar">
+                    <a href="#/dashboard" class="sidebar-link active">
+                        <i data-lucide="layout-dashboard"></i> Dashboard Home
+                    </a>
+                    <a href="#/predict" class="sidebar-link">
+                        <i data-lucide="heart-handshake"></i> Start Diagnosis
+                    </a>
+                    <a href="#/dataset-info" class="sidebar-link">
+                        <i data-lucide="database"></i> Dataset Statistics
+                    </a>
+                    <a href="#/docs" class="sidebar-link">
+                        <i data-lucide="graduation-cap"></i> Documentation
+                    </a>
+                    <a href="#/profile" class="sidebar-link">
+                        <i data-lucide="user-circle"></i> Profile Profile
+                    </a>
+                    <a href="#/settings" class="sidebar-link">
+                        <i data-lucide="settings"></i> Settings Options
+                    </a>
+                    <a href="#" class="sidebar-link logout-trigger" style="color: var(--error); margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;">
+                        <i data-lucide="log-out"></i> End Session
+                    </a>
+                </aside>
+
+                <!-- Dashboard Content Panels -->
+                <div class="dashboard-content">
+                    <div>
+                        <h2>Diagnostics Hub</h2>
+                        <p style="font-size: 13.5px; color: var(--text-secondary);">Patient aggregate predictions activity and machine metrics</p>
+                    </div>
+
+                    <!-- Metrics Aggregations Grid -->
+                    <div class="metrics-cards-grid" id="db-cards-container">
+                        <!-- Dynamic metrics go here -->
+                    </div>
+
+                    <!-- Dashboard Analytical Charts -->
+                    <div class="charts-grid">
+                        <div class="glass-card chart-card">
+                            <h3>Risk Level Classifications</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="riskPieChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="glass-card chart-card">
+                            <h3>ML Classifier Comparison</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="modelBarChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid" style="grid-template-columns: 1fr;">
+                        <div class="glass-card chart-card" style="height: 350px;">
+                            <h3>Calculated Probability Trend (Last 10 Runs)</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="riskTrendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- History Table -->
+                    <div class="glass-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="font-size: 16px;">Recent Diagnostic Records</h3>
+                            <a href="#/predict" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12.5px;">New Prediction</a>
+                        </div>
+                        <div id="recent-activity-container">
+                            <!-- Dynamic Table list -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- View G: Heart Disease Prediction Wizard Module -->
+        <div id="predict-view" class="view-section">
+            <div class="prediction-wizard glass-card">
+                
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2>Cardiovascular Diagnostic Questionnaire</h2>
+                    <p style="font-size: 13.5px; color: var(--text-secondary);">Supply clinical factors to calculate heart disease correlation</p>
+                </div>
+
+                <!-- Progressive Progress nodes -->
+                <div class="wizard-progress-bar">
+                    <div class="wizard-progress-fill" id="wizard-progress-fill"></div>
+                    <div class="wizard-step-node active" id="wizard-node-1">1</div>
+                    <div class="wizard-step-node" id="wizard-node-2">2</div>
+                    <div class="wizard-step-node" id="wizard-node-3">3</div>
+                </div>
+
+                <form id="prediction-wizard-form">
+                    
+                    <!-- Pane 1: Demographics & Basic Vitals -->
+                    <div class="wizard-pane active" id="wizard-step-1">
+                        <h3 style="margin-bottom: 20px; font-size: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px; color: var(--primary);">Step 1: Patient Demographics & Vitals</h3>
+                        
+                        <div class="wizard-row">
+                            <div class="form-group">
+                                <label class="form-label" for="age">Patient Age (years)</label>
+                                <input type="number" id="age" class="form-control" required min="1" max="120" placeholder="e.g. 54">
+                                <span class="invalid-feedback"></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="sex">Gender</label>
+                                <select id="sex" class="form-control">
+                                    <option value="1">Male</option>
+                                    <option value="0">Female</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="wizard-row">
+                            <div class="form-group">
+                                <label class="form-label" for="trestbps">
+                                    Resting Blood Pressure (mmHg)
+                                    <span class="tooltip-icon" data-tooltip="Blood pressure measured on admission in mmHg. Normal range is <120.">?</span>
+                                </label>
+                                <input type="number" id="trestbps" class="form-control" required min="50" max="250" placeholder="e.g. 130">
+                                <span class="invalid-feedback"></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="chol">
+                                    Serum Cholesterol (mg/dL)
+                                    <span class="tooltip-icon" data-tooltip="Total cholesterol measurement. Desirable range is <200 mg/dL.">?</span>
+                                </label>
+                                <input type="number" id="chol" class="form-control" required min="80" max="600" placeholder="e.g. 240">
+                                <span class="invalid-feedback"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="fbs">
+                                Fasting Blood Sugar > 120 mg/dL
+                                <span class="tooltip-icon" data-tooltip="Indicates if patient's fasting blood glucose is elevated above 120 mg/dL (1 = Yes, 0 = No).">?</span>
+                            </label>
+                            <select id="fbs" class="form-control">
+                                <option value="0">No (Fasting Blood Sugar &le; 120 mg/dL)</option>
+                                <option value="1">Yes (Fasting Blood Sugar > 120 mg/dL)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Pane 2: Symptoms & ECG Details -->
+                    <div class="wizard-pane" id="wizard-step-2">
+                        <h3 style="margin-bottom: 20px; font-size: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px; color: var(--primary);">Step 2: Symptoms & Cardiogram Attributes</h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="cp">
+                                Chest Pain Type (cp)
+                                <span class="tooltip-icon" data-tooltip="Anginal pain indicators: Typical/Atypical Angina, Non-anginal pain, or asymptomatic.">?</span>
+                            </label>
+                            <select id="cp" class="form-control">
+                                <option value="0">Typical Angina</option>
+                                <option value="1">Atypical Angina</option>
+                                <option value="2">Non-anginal Pain</option>
+                                <option value="3">Asymptomatic</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="restecg">
+                                Resting Electrocardiographic Results (restecg)
+                                <span class="tooltip-icon" data-tooltip="ECG findings at rest: Normal, ST-T abnormalities, or Left ventricular hypertrophy.">?</span>
+                            </label>
+                            <select id="restecg" class="form-control">
+                                <option value="0">Normal</option>
+                                <option value="1">Having ST-T wave abnormality</option>
+                                <option value="2">Showing probable/definite Left Ventricular Hypertrophy</option>
+                            </select>
+                        </div>
+
+                        <div class="wizard-row">
+                            <div class="form-group">
+                                <label class="form-label" for="thalach">
+                                    Maximum Heart Rate Achieved (thalach)
+                                    <span class="tooltip-icon" data-tooltip="Peak heart rate recorded during stress exercise test. Normal is 220 - age.">?</span>
+                                </label>
+                                <input type="number" id="thalach" class="form-control" required min="50" max="220" placeholder="e.g. 150">
+                                <span class="invalid-feedback"></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="exang">
+                                    Exercise Induced Angina (exang)
+                                    <span class="tooltip-icon" data-tooltip="Chest pain triggered specifically by exercise stress (1 = Yes, 0 = No).">?</span>
+                                </label>
+                                <select id="exang" class="form-control">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pane 3: Angiography & Stress Tests -->
+                    <div class="wizard-pane" id="wizard-step-3">
+                        <h3 style="margin-bottom: 20px; font-size: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px; color: var(--primary);">Step 3: Stress Segment & Vessels</h3>
+                        
+                        <div class="wizard-row">
+                            <div class="form-group">
+                                <label class="form-label" for="oldpeak">
+                                    ST Depression (oldpeak)
+                                    <span class="tooltip-icon" data-tooltip="ST depression segment induced by exercise relative to rest (in mm).">?</span>
+                                </label>
+                                <input type="number" step="0.1" id="oldpeak" class="form-control" required min="0.0" max="10.0" placeholder="e.g. 1.2">
+                                <span class="invalid-feedback"></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="slope">
+                                    Slope of Peak Exercise ST Segment (slope)
+                                    <span class="tooltip-icon" data-tooltip="Slope configuration of peak exercise: Upsloping, Flat, or Downsloping.">?</span>
+                                </label>
+                                <select id="slope" class="form-control">
+                                    <option value="0">Upsloping</option>
+                                    <option value="1">Flat</option>
+                                    <option value="2">Downsloping</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="wizard-row">
+                            <div class="form-group">
+                                <label class="form-label" for="ca">
+                                    Major Vessels Colored by Fluoroscopy (ca)
+                                    <span class="tooltip-icon" data-tooltip="Number of major blood vessels (0-3) visible under fluoroscopic dye scan.">?</span>
+                                </label>
+                                <select id="ca" class="form-control">
+                                    <option value="0">0 vessels</option>
+                                    <option value="1">1 vessel</option>
+                                    <option value="2">2 vessels</option>
+                                    <option value="3">3 vessels</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="thal">
+                                    Thalassemia Diagnostic Type (thal)
+                                    <span class="tooltip-icon" data-tooltip="Blood disorder scan results: 3 = Normal, 6 = Fixed defect, 7 = Reversible defect.">?</span>
+                                </label>
+                                <select id="thal" class="form-control">
+                                    <option value="3">Normal Thalassemia scan</option>
+                                    <option value="6">Fixed Defect scan</option>
+                                    <option value="7">Reversible Defect scan</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 10px; border-top: 1px solid var(--border); padding-top: 15px;">
+                            <label class="form-label" for="model_used" style="color: var(--secondary);">Inference Prediction Classifier Model</label>
+                            <select id="model_used" class="form-control" style="border: 1.5px solid var(--secondary);">
+                                <option value="Stacking Classifier">Stacking Classifier (Ensemble Meta-Model)</option>
+                                <option value="Random Forest">Random Forest Classifier</option>
+                                <option value="XGBoost">XGBoost Classifier</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Wizard Buttons -->
+                    <div class="wizard-buttons">
+                        <button type="button" class="btn btn-outline" id="wizard-prev-btn" style="display: none;">
+                            <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i> Previous
+                        </button>
+                        <div style="flex-grow: 1;"></div>
+                        <button type="button" class="btn btn-primary" id="wizard-next-btn">
+                            Next Step <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        <button type="submit" class="btn btn-secondary animate-pulse" id="wizard-submit-btn" style="display: none;">
+                            Execute Diagnosis <i data-lucide="activity" style="width: 16px; height: 16px;"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Model Benchmark Evaluations Panel -->
+            <div class="prediction-wizard glass-card" style="margin-top: 30px;">
+                <h3>Baseline Classifier Performance (Test Set Evaluation)</h3>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 15px;">These performance markers represent standard cross-validation results computed during ensemble training.</p>
+                <div class="metrics-eval-grid" id="model-metrics-eval-grid">
+                    <!-- Dynamically filled with training metrics -->
+                </div>
+            </div>
+        </div>
+
+        <!-- View H: Prediction Results Page -->
+        <div id="results-view" class="view-section">
+            <div class="prediction-wizard">
+                <div class="result-header">
+                    <h2>Diagnostic Risk Profile</h2>
+                    <p style="font-size: 14px; color: var(--text-secondary);">Calculated heart disease probability from AI Ensemble Stack</p>
+                </div>
+
+                <div class="result-layout">
+                    
+                    <!-- Circular Meter -->
+                    <div class="glass-card meter-wrapper" style="position: relative;">
+                        <svg class="risk-circle-svg" width="160" height="160" viewBox="0 0 120 120">
+                            <circle class="risk-circle-bg" cx="60" cy="60" r="50"></circle>
+                            <circle class="risk-circle-progress" id="risk-progress-circle" cx="60" cy="60" r="50" stroke-dasharray="314.15" stroke-dashoffset="314.15"></circle>
+                        </svg>
+                        <div class="score-center-text">
+                            <span class="score-num" id="result-score-num">0</span>
+                            <span class="score-lbl">Health Score</span>
+                        </div>
+                        <div style="margin-top: 25px; text-align: center;">
+                            <div style="font-size: 13px; color: var(--text-secondary);">Pathological Risk Probability</div>
+                            <div style="font-size: 26px; font-weight: 800; color: var(--primary);" id="result-prob-percentage">0%</div>
+                            <div style="font-size: 11.5px; color: var(--text-secondary); margin-top: 5px;">Model: <strong id="result-model-text">Stacking</strong></div>
+                        </div>
+                    </div>
+
+                    <!-- Details & suggestions -->
+                    <div class="suggestions-card">
+                        <!-- Risk Alert Banner Card -->
+                        <div class="result-card-alert" id="result-alert-card">
+                            <!-- Injected dynamically -->
+                        </div>
+
+                        <!-- Recommendations Lists -->
+                        <div class="glass-card" style="padding: 20px;">
+                            <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 15px;">Tailored Clinical Interventions</h3>
+                            <div id="result-suggestions-container">
+                                <!-- Dynamic Recommendations -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export tools -->
+                <div style="text-align: center; margin-top: 40px; display: flex; justify-content: center; gap: 15px;">
+                    <a href="#/predict" class="btn btn-outline" style="padding: 12px 24px;">New Diagnosis</a>
+                    <a href="#" target="_blank" id="results-pdf-btn" class="btn btn-primary" style="padding: 12px 24px;">
+                        <i data-lucide="download-cloud"></i> Download PDF Report
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- View I: Dataset Information Page -->
+        <div id="dataset-view" class="view-section">
+            <div class="dataset-layout">
+                <div class="glass-card" style="text-align: center;">
+                    <h2>UCI Cleveland Dataset Metadata</h2>
+                    <p style="max-width: 800px; margin: 10px auto 0; font-size: 14.5px; color: var(--text-secondary);">The Cleveland database is a gold standard cardiac repository comprising 303 cases. In our pre-processing, patients indicating categorical integers 1, 2, 3, or 4 for disease narrowing are classified under diagnostic Heart Disease (1), while level 0 implies Normal (0).</p>
+                </div>
+
+                <!-- Subplots Visualizations -->
+                <div class="visualizations-row">
+                    <div class="glass-card vis-card">
+                        <h3>Dataset Features Correlation Heatmap</h3>
+                        <p style="font-size: 12px; color: var(--text-secondary);">Calculates Pearson coefficient matrix. Values close to +1 denote high positive correlation.</p>
+                        <img id="dataset-heatmap-img" src="/static/img/heatmap.png" alt="UCI Cleveland Correlation Heatmap">
+                    </div>
+                    <div class="glass-card vis-card">
+                        <h3>Statistical Data Distributions</h3>
+                        <p style="font-size: 12px; color: var(--text-secondary);">Contrasts patient frequencies by age brackets and maps maximum heart rates achieved against patient age.</p>
+                        <img id="dataset-dist-img" src="/static/img/distributions.png" alt="Patient Demographics Distributions">
+                    </div>
+                </div>
+
+                <!-- Dataset Attributes documentation -->
+                <div class="glass-card">
+                    <h3 style="margin-bottom: 20px; font-size: 18px; color: var(--primary);">UCI Dataset Attribute Descriptions</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Feature Name</th>
+                                    <th>Data Type</th>
+                                    <th>Valid Bounds / Categories</th>
+                                    <th>Clinical Indication</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Age</strong></td>
+                                    <td>Integer</td>
+                                    <td>29 to 77 years</td>
+                                    <td>General demographics variable representing patient age.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Sex</strong></td>
+                                    <td>Binary</td>
+                                    <td>1 = Male; 0 = Female</td>
+                                    <td>Gender identity notation.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>cp (Chest Pain)</strong></td>
+                                    <td>Categorical</td>
+                                    <td>0: Typical Angina; 1: Atypical Angina; 2: Non-anginal; 3: Asymptomatic</td>
+                                    <td>Indicates angina symptomatic variations.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>trestbps</strong></td>
+                                    <td>Integer</td>
+                                    <td>94 to 200 mmHg</td>
+                                    <td>Resting systolic blood pressure upon admission.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>chol</strong></td>
+                                    <td>Integer</td>
+                                    <td>126 to 564 mg/dL</td>
+                                    <td>Serum cholesterol density test results.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>fbs</strong></td>
+                                    <td>Binary</td>
+                                    <td>1 = glucose > 120 mg/dL; 0 = glucose &le; 120 mg/dL</td>
+                                    <td>Fasting blood sugar metabolic indicator.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>restecg</strong></td>
+                                    <td>Categorical</td>
+                                    <td>0: Normal; 1: ST-T wave anomalies; 2: Left ventricular hypertrophy</td>
+                                    <td>Resting electrocardiogram waveform classification.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>thalach</strong></td>
+                                    <td>Integer</td>
+                                    <td>71 to 202 bpm</td>
+                                    <td>Maximum heart rate achieved during exercise stress tests.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>exang</strong></td>
+                                    <td>Binary</td>
+                                    <td>1 = Yes; 0 = No</td>
+                                    <td>Indicates if exertion induced chest angina.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>oldpeak</strong></td>
+                                    <td>Float</td>
+                                    <td>0.0 to 6.2 mm</td>
+                                    <td>ST depression segment relative to rest values.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>slope</strong></td>
+                                    <td>Categorical</td>
+                                    <td>0: Upsloping; 1: Flat; 2: Downsloping</td>
+                                    <td>Peak exercise ST slope configuration.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ca</strong></td>
+                                    <td>Integer</td>
+                                    <td>0 to 3 vessels</td>
+                                    <td>Major heart vessels colored by fluoroscopic scan.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>thal</strong></td>
+                                    <td>Categorical</td>
+                                    <td>3: Normal; 6: Fixed defect; 7: Reversible defect</td>
+                                    <td>Nuclear thalassemia perfusion imaging results.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View J: Admin Console Panel -->
+        <div id="admin-view" class="view-section">
+            <h2>Administration Control Panel</h2>
+            <p style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 25px;">Review database user registrations, prediction audits, and manage ML dataset model parameters</p>
+
+            <div class="admin-tabs">
+                <button class="admin-tab active" data-target="admin-users-pane">User Accounts</button>
+                <button class="admin-tab" data-target="admin-logs-pane">Diagnostic Audits</button>
+                <button class="admin-tab" data-target="admin-dataset-pane">Dataset Tuning</button>
+            </div>
+
+            <!-- Tab 1: Users Accounts Management -->
+            <div class="admin-panel-content active" id="admin-users-pane">
+                <div class="filter-bar">
+                    <div class="search-input-wrapper">
+                        <i data-lucide="search"></i>
+                        <input type="text" id="admin-users-search" class="form-control" placeholder="Search by name, email, or role...">
+                    </div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">Manage patient and admin user registers</div>
+                </div>
+                <div id="admin-users-list">
+                    <!-- Injected dynamically -->
+                </div>
+            </div>
+
+            <!-- Tab 2: Diagnostic Logs Audits -->
+            <div class="admin-panel-content" id="admin-logs-pane">
+                <div class="filter-bar">
+                    <div class="search-input-wrapper">
+                        <i data-lucide="search"></i>
+                        <input type="text" id="admin-logs-search" class="form-control" placeholder="Search by patient, model, risk...">
+                    </div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">Audit trace of all calculated predictions</div>
+                </div>
+                <div id="admin-logs-list">
+                    <!-- Injected dynamically -->
+                </div>
+            </div>
+
+            <!-- Tab 3: Dataset Tuning & retraining -->
+            <div class="admin-panel-content" id="admin-dataset-pane">
+                <div class="glass-card" style="max-width: 600px; margin: 20px auto; text-align: center;">
+                    <i data-lucide="database-backup" style="width: 40px; height: 40px; color: var(--primary); margin-bottom: 15px;"></i>
+                    <h3>Retrain Prediction Classifiers</h3>
+                    <p style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 20px;">Upload a modified heart disease CSV dataset matching the 14 attributes layout. The backend will validate headers, replace the current CSV, and retrain the Random Forest, XGBoost, and Stacking meta-models instantly.</p>
+                    
+                    <div class="dataset-upload-zone" id="dataset-upload-zone">
+                        <i data-lucide="upload-cloud"></i>
+                        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 5px;">Drag & Drop CSV File here</h4>
+                        <p style="font-size: 12px; color: var(--text-secondary);">or click to browse local directory</p>
+                        <input type="file" id="dataset-file-input" style="display: none;" accept=".csv">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View K: Project Academic Documentation -->
+        <div id="docs-view" class="view-section">
+            <div class="glass-card" style="max-width: 960px; margin: 0 auto; padding: 40px;">
+                <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid var(--border); padding-bottom: 20px;">
+                    <h1 style="font-family: var(--font-heading); font-size: 26px; color: var(--primary);">Heart Disease Prediction System using UCI Cleveland Dataset</h1>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-top: 5px;">ACADEMIC FINAL YEAR PROJECT DOCUMENTATION REPORT</p>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; color: var(--primary); font-size: 18px;">1. Abstract</h3>
+                <p style="font-size: 14px; text-align: justify; margin-bottom: 15px;">Cardiovascular diseases (CVDs) remain the leading cause of mortality globally, taking an estimated 17.9 million lives each year. Early identification of cardiac vulnerabilities is crucial for preventive healthcare. This project develops an AI-powered Clinical Decision Support System (CDSS) that leverages machine learning models to assess coronary artery disease risk. Utilizing the UCI Cleveland Heart Disease dataset, the system implements an ensemble stacking pipeline consisting of Random Forest and XGBoost classifiers optimized through a meta-logistic regression algorithm. Secure user logins (with JWT) and automated ReportLab PDF reports compose a complete medical informatics tool.</p>
+
+                <h3 style="margin: 20px 0 10px; color: var(--primary); font-size: 18px;">2. Problem Statement</h3>
+                <p style="font-size: 14px; text-align: justify; margin-bottom: 15px;">Traditional clinical diagnostic procedures for coronary artery disease rely on intensive invasive processes like coronary angiography, which are expensive, require expert clinicians, and present localized risks. Non-invasive, machine learning-driven risk prediction serves as a critical first-pass screening utility. The core challenge is establishing high diagnostic accuracy (sensitivity and specificity) using non-invasive clinical attributes such as resting blood pressure, serum cholesterol levels, chest pain classifications, and electrocardiogram indexes.</p>
+
+                <h3 style="margin: 20px 0 10px; color: var(--primary); font-size: 18px;">3. Objectives</h3>
+                <ul style="font-size: 14px; margin-left: 20px; margin-bottom: 15px;">
+                    <li>Implement a preprocessing pipeline handling missing data and standardizing values.</li>
+                    <li>Train and validate Random Forest, XGBoost, and Stacking ensemble classifiers.</li>
+                    <li>Develop a secure role-based full-stack system with JWT session security.</li>
+                    <li>Format clinical recommendations and export downloadable PDF diagnostic metrics.</li>
+                    <li>Establish an elegant responsive layout with clean medical illustrations.</li>
+                </ul>
+
+                <h3 style="margin: 20px 0 10px; color: var(--primary); font-size: 18px;">4. System Architecture</h3>
+                <p style="font-size: 14px; text-align: justify; margin-bottom: 15px;">The system operates on a client-server architecture. The frontend SPA manages state changes dynamically via custom Hash Routing to prevent full-page refreshes. It communicates with the Python Flask Backend over secure HTTP REST endpoints. JWT tokens are verified on all restricted routes. The backend manages SQL reads/writes in SQLite, executes machine learning inference using serialized joblib files, and parses PDF files on the fly.</p>
+
+                <div style="background-color: var(--bg-primary); border: 1px solid var(--border); padding: 15px; border-radius: var(--radius-md); font-family: monospace; font-size: 12.5px; overflow-x: auto; margin-bottom: 15px;">
+                  [Client Web Browser SPA] 
+                           |   (HTTP Requests + JWT Bearer)
+                           v
+                  [Flask REST API Gateway]
+                    /              \
+                   v                v
+            [SQLite DB]       [ML Ensemble Models]
+            (User & Logs)     (RF, XGB, Stack Scalers)
+                                    |
+                                    v
+                            [ReportLab Engine] --> (PDF Report)
+                </div>
+
+                <h3 style="margin: 20px 0 10px; color: var(--primary); font-size: 18px;">5. Experimental Results</h3>
+                <p style="font-size: 14px; text-align: justify; margin-bottom: 15px;">During cross-validation and test set assessments, models achieved high classification benchmarks. The baseline Random Forest model demonstrates robust performance with 81.9% accuracy. XGBoost displays optimized specificity, scoring 83.6% accuracy. The Stacking Meta-Classifier establishes the highest accuracy (~85.2%) with balanced sensitivity (Recall) and specificity (Precision), verifying that multi-model voting successfully overrides single-classifier bias.</p>
+
+                <h3 style="margin: 20px 0 10px; color: var(--primary); font-size: 18px;">6. Future Scope</h3>
+                <p style="font-size: 14px; text-align: justify; margin-bottom: 15px;">Future enhancements include integrating real-time telemetry inputs from smart wearable IoT devices (tracking heart rate variability and blood pressure levels continuously), utilizing deep learning neural networks, and aligning security frameworks with HIPAA compliance protocols for deployment in clinical testbed scenarios.</p>
+            </div>
+        </div>
+
+        <!-- View L: User Profile Page -->
+        <div id="profile-view" class="view-section">
+            <div class="prediction-wizard glass-card">
+                <h2>Account Settings</h2>
+                <p style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 20px;">Patient demographic variables and access keys</p>
+                
+                <div class="profile-card">
+                    <div class="profile-avatar" id="profile-avatar-lbl">U</div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <h3 id="profile-username-val" style="font-size: 20px; font-weight: 700;">John Doe</h3>
+                        <p id="profile-email-val" style="color: var(--text-secondary); font-size: 14px;">john@example.com</p>
+                        <p style="margin-top: 5px;"><span class="badge badge-low" id="profile-role-val">Patient</span></p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="font-size: 13px; color: var(--text-secondary);">Registered under secure SHA-256 database architecture. If you need to make changes to credentials, please contact support.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View M: Settings Page -->
+        <div id="settings-view" class="view-section">
+            <div class="prediction-wizard glass-card">
+                <h2>System Customization Settings</h2>
+                <p style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 25px;">Toggle accessibility preferences and system logs properties</p>
+                
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid var(--border);">
+                        <div>
+                            <h4 style="font-size: 14px; font-weight: 700;">High Contrast UI Color Palette</h4>
+                            <p style="font-size: 12.5px; color: var(--text-secondary);">Increases legibility markers across graphs and details cards.</p>
+                        </div>
+                        <label class="theme-switch">
+                            <input type="checkbox" id="settings-contrast-checkbox">
+                            <div class="slider"></div>
+                        </label>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid var(--border);">
+                        <div>
+                            <h4 style="font-size: 14px; font-weight: 700;">System Email Updates</h4>
+                            <p style="font-size: 12.5px; color: var(--text-secondary);">Receive notification records when reports are downloaded.</p>
+                        </div>
+                        <label class="theme-switch">
+                            <input type="checkbox" checked id="settings-updates-checkbox">
+                            <div class="slider"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 3. Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-about">
+                <div class="logo-container" style="font-size: 18px; margin-bottom: 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="lucide"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l1.5-3 2 6 1.5-3h3.8"/></svg>
+                    <span>Heart<span>AI</span></span>
+                </div>
+                <p style="font-size: 13px; max-width: 320px;">An academic full-stack Clinical Decision Support System leveraging Machine Learning classifiers to predict coronary artery conditions.</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-col">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#/dataset-info">Dataset Information</a></li>
+                        <li><a href="#/docs">Documentation</a></li>
+                        <li><a href="https://archive.ics.uci.edu/dataset/45/heart+disease" target="_blank">UCI Cleveland Source</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Support Portal</h4>
+                    <ul>
+                        <li><a href="#/login">Patient Login</a></li>
+                        <li><a href="#/admin-login">Admin Portal</a></li>
+                        <li><a href="#/">Contact Systems</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 HeartAI Decision Support Systems. Developed for Academic Final Year Project Demonstrations.
+        </div>
+    </footer>
+
+    <!-- 4. Loading Overlay Indicator -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <div style="font-family: 'Outfit', sans-serif; font-weight: 600; color: var(--text-primary);" id="loader-text">Analyzing parameters...</div>
+    </div>
+
+    <!-- Application Javascript Modules -->
+    <script src="/static/js/components.js"></script>
+    <script type="module" src="/static/js/app.js"></script>
+    <script>
+        // Trigger lucide icon replacement
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+        
+        // Setup MutationObserver to watch DOM modifications and replace new lucide icons
+        const observer = new MutationObserver(() => {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    </script>
+</body>
+</html>
