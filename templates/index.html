@@ -308,9 +308,18 @@
 
                 <!-- Dashboard Content Panels -->
                 <div class="dashboard-content">
-                    <div>
-                        <h2>Diagnostics Hub</h2>
-                        <p style="font-size: 13.5px; color: var(--text-secondary);">Patient aggregate predictions activity and machine metrics</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid var(--border); padding-bottom: 15px;">
+                        <div>
+                            <h2>Diagnostics Hub</h2>
+                            <p style="font-size: 13.5px; color: var(--text-secondary);">Patient aggregate predictions activity and machine metrics</p>
+                        </div>
+                        <div class="glass-card" style="padding: 10px 20px; border-radius: var(--radius-md); display: flex; gap: 15px; font-size: 13.5px; align-items: center; margin: 0;">
+                            <div><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; color: var(--primary); display: inline-block; margin-right: 4px;"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><strong>Patient:</strong> <span id="db-patient-name">Patient</span></div>
+                            <div style="border-left: 1px solid var(--border); height: 18px;"></div>
+                            <div><strong>Age:</strong> <span id="db-patient-age">N/A</span> yrs</div>
+                            <div style="border-left: 1px solid var(--border); height: 18px;"></div>
+                            <div><strong>Gender:</strong> <span id="db-patient-gender">N/A</span></div>
+                        </div>
                     </div>
 
                     <!-- Metrics Aggregations Grid -->

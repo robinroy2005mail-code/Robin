@@ -43,10 +43,26 @@ const Dashboard = {
             this.updateStatsCards(predictions, metricsData);
             this.renderRecentTable(predictions);
             this.renderCharts(predictions, metricsData);
+            this.updatePatientProfile(predictions);
 
         } catch (error) {
             console.error('Dashboard loading error:', error);
             Toast.error('Network error loading dashboard statistics.');
+        }
+    },
+
+    updatePatientProfile(predictions) {
+        const user = Auth.getUser();
+        if (user) {
+            document.getElementById('db-patient-name').innerText = user.username;
+        }
+        if (predictions.length > 0) {
+            const latest = predictions[0];
+            document.getElementById('db-patient-age').innerText = latest.age;
+            document.getElementById('db-patient-gender').innerText = latest.sex === 1 ? 'Male' : 'Female';
+        } else {
+            document.getElementById('db-patient-age').innerText = 'N/A';
+            document.getElementById('db-patient-gender').innerText = 'N/A';
         }
     },
 
