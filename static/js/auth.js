@@ -278,4 +278,3 @@ const Auth = {
 };
 
 window.Auth = Auth;
-export default Auth;

@@ -387,4 +387,3 @@ const Prediction = {
 };
 
 window.Prediction = Prediction;
-export default Prediction;

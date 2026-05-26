@@ -230,4 +230,3 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.App = App;
-export default App;

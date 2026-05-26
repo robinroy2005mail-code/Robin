@@ -348,4 +348,3 @@ const Admin = {
 };
 
 window.Admin = Admin;
-export default Admin;
